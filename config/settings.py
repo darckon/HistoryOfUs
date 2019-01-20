@@ -4,7 +4,7 @@ import datetime
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '05dcpjeiw=gn5qo)tgj(m+)o!ly*1wqtdvoselghk#+=3blnop'
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.0.12']
 
 INSTALLED_APPS = [
     'django.contrib.admin',

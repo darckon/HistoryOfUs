@@ -6,7 +6,8 @@ from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify
 from core import api as core_api
 
 router = routers.DefaultRouter()
-router.register('users', core_api.UserViewSet),
+router.register('api/registration', core_api.RegistrationViewSet),
+router.register('api/users', core_api.UserViewSet),
 
 urlpatterns = [
     path('admin/', admin.site.urls),

@@ -4,6 +4,57 @@ import uuid
 
 # Create your models here.
 
+class User(AbstractUser):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, db_index=True, editable=False)
+    #escenario = models.ManyToManyField('core.Escenario', related_name='escenarios')
+    personaje = models.ManyToManyField('core.Trama', related_name='personajes', through='core.Personaje')
+    created_at = models.DateTimeField(("creado el"), auto_now_add=True)
+    updated_at = models.DateTimeField(("actualizado el"), auto_now=True)
+        
+    class Meta:
+        """ 
+        User.
+            username
+            password
+            first_name
+            last_name
+            email
+            is_staff
+            is_active
+            date_joined
+        """
+        ordering = ('first_name', )
+        verbose_name = ("Usuario")
+        verbose_name_plural = ("Usuarios")
+
+class Personaje(models.Model):
+    user = models.ForeignKey("core.User", db_index=True, related_name='users', verbose_name=("usuario"), on_delete=models.CASCADE, unique=True)
+    trama = models.ForeignKey("core.Trama", db_index=True, related_name='personaje_trama', verbose_name=("trama"), on_delete=models.CASCADE)
+    rol = models.ForeignKey('core.Rol', verbose_name=("Rol"), on_delete=models.CASCADE)
+    created_at = models.DateTimeField(("creado el"), auto_now_add=True)
+    updated_at = models.DateTimeField(("actualizado el"), auto_now=True)
+
+    class Meta:
+        verbose_name = ("Personaje")
+        verbose_name_plural = ("Personajes")
+
+    def __str__(self):
+        return '%s :: %s' % (self.user, self.trama)
+
+class Rol(models.Model):
+    nombre = models.CharField('nombre', max_length = 100)
+    stock = models.IntegerField('Stock', help_text='Cantidad total disponible de roles en la historia')
+    stock_ocupado = models.IntegerField('Stock ocupado', help_text='Total de roles ocupados hasta el momento')
+    created_at = models.DateTimeField(("creado el"), auto_now_add=True)
+    updated_at = models.DateTimeField(("actualizado el"), auto_now=True)
+
+    class Meta:
+        verbose_name = ("Rol")
+        verbose_name_plural = ("Roles")
+
+    def __str__(self):
+        return self.nombre
+
 class Escenario(models.Model):
     nombre = models.CharField('Escenario', max_length = 100)
     activa = models.BooleanField(default = True)
@@ -95,6 +146,7 @@ class Tipo_Pregunta(models.Model):
 class Pregunta(models.Model):
     descripcion = models.TextField('Descripcion')
     tipo_pregunta = models.ForeignKey(Tipo_Pregunta, on_delete=models.PROTECT)
+    rol = models.ManyToManyField(Rol, related_name='roles')
     alternativas = models.ManyToManyField("core.Alternativa", related_name='alternativas')
     orden = models.IntegerField("Orden", null=True)
     created_at = models.DateTimeField(("creado el"), auto_now_add=True)

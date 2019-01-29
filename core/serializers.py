@@ -1,31 +1,69 @@
 # -*- encoding: utf-8 -*-
-from core.models import User
+from core.models import User, Personaje
 from rest_framework import serializers
+from rest_framework.exceptions import PermissionDenied
+from rest_framework import status
+from rest_framework_jwt.settings import api_settings
+
+
+class MyCustomExcpetion(PermissionDenied):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = "Custom Exception Message"
+    default_code = 'invalid'
+
+    def __init__(self, detail, status_code=None):
+        self.detail = detail
+        if status_code is not None:
+            self.status_code = status_code
 
 class UserSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = User
 		fields = '__all__'
 
+class PersonajeSerializer(serializers.ModelSerializer):
+    escenario_id = serializers.ReadOnlyField(source='trama.escenario.id')
+    escenario_nombre = serializers.ReadOnlyField(source='trama.escenario.nombre')
+    trama_id = serializers.ReadOnlyField(source='trama.id')
+    trama_nombre = serializers.ReadOnlyField(source='trama.nombre')
+    rol_id = serializers.ReadOnlyField(source='rol.id')
+    rol_nombre = serializers.ReadOnlyField(source='rol.nombre')
+    class Meta:
+        model = Personaje
+        fields = ('id', 'escenario_id', 'escenario_nombre', 'trama_id', 'trama_nombre', 'rol_id', 'rol_nombre')
+
+class UserMeSerializer(serializers.ModelSerializer):
+    personaje = PersonajeSerializer(source='personaje_set', many=True)
+    class Meta:
+        model = User
+        fields = ('id','username','email', 'personaje')
+
 class RegistrationSerializer(serializers.ModelSerializer):
-    # Ensure passwords are at least 8 characters long, no longer than 128
-    # characters, and can not be read by the client.
     password = serializers.CharField(
         max_length=128,
         min_length=8,
         write_only=True
     )
 
-    # The client should not be able to send a token along with a registration
-    # request. Making `token` read-only handles that for us.
-    token = serializers.CharField(max_length=255, read_only=True)
-
     class Meta:
         model = User
-        # List all of the fields that could possibly be included in a request
-        # or response, including fields specified explicitly above.
-        fields = ['id', 'email', 'username', 'password', 'token']
+        fields = ['email', 'username', 'password']
+
+    def to_representation(self, instance):
+        # instance is the model object. create the custom json format by accessing instance attributes normaly and return it
+        identifiers = dict()
+        identifiers['email'] = instance.email
+        identifiers['username'] = instance.username
+        representation = {
+            'success': 'true',
+            'data': identifiers,
+        }
+        return representation
 
     def create(self, validated_data):
-        # Use the `create_user` method we wrote earlier to create a new user.
-        return User.objects.create_user(**validated_data)
+        print('pase')
+        user = super(RegistrationSerializer, self).create(validated_data)
+        user.set_password(self.context['request'].data['password'])
+        user.email = self.context['request'].data['email']
+        user.save()
+        return user

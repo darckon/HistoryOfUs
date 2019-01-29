@@ -6,13 +6,14 @@ from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
-from core.serializers import UserSerializer, RegistrationSerializer
+from core.serializers import UserSerializer, RegistrationSerializer, UserMeSerializer
 
 
 class RegistrationViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
     queryset = User.objects.all()
     serializer_class = RegistrationSerializer
+    filter_fields = '__all__'
 
 class UserViewSet(viewsets.ModelViewSet):
     authentication_classes = (JSONWebTokenAuthentication,)
@@ -20,9 +21,13 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     filter_fields = '__all__'
     filter_backends = (DjangoFilterBackend,)
-
+    
     @list_route(methods=['get'], url_path='me')
     def getUser(self, request):
         user = User.objects.get(pk = request.user.pk)
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
+        serializer = UserMeSerializer(user)
+        if serializer.data:
+            response = Response({'success':'true', 'data': serializer.data})
+        return response
+
+    

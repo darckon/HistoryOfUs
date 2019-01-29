@@ -28,8 +28,8 @@ class User(AbstractUser):
         verbose_name_plural = ("Usuarios")
 
 class Personaje(models.Model):
-    user = models.ForeignKey("core.User", db_index=True, related_name='users', verbose_name=("usuario"), on_delete=models.CASCADE, unique=True)
-    trama = models.ForeignKey("core.Trama", db_index=True, related_name='personaje_trama', verbose_name=("trama"), on_delete=models.CASCADE)
+    user = models.ForeignKey("core.User", db_index=True, related_name='personaje_set', verbose_name=("usuario"), on_delete=models.CASCADE, unique=True)
+    trama = models.ForeignKey("core.Trama", db_index=True, related_name='personaje_set', verbose_name=("trama"), on_delete=models.CASCADE)
     rol = models.ForeignKey('core.Rol', verbose_name=("Rol"), on_delete=models.CASCADE)
     created_at = models.DateTimeField(("creado el"), auto_now_add=True)
     updated_at = models.DateTimeField(("actualizado el"), auto_now=True)

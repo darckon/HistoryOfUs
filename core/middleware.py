@@ -1,5 +1,9 @@
 import json
 
+#Constantes
+FALSE = 'false'
+TRUE = 'true'
+
 class SimpleMiddleware:
     
     def __init__(self, get_response):
@@ -11,10 +15,9 @@ class SimpleMiddleware:
         # the view (and later middleware) are called.
 
         response = self.get_response(request)
-        if response.status_code == 400:
-            response.data['status'] = response.status_code
+        if response.status_code != 200:
+            response.data['status'] = FALSE
             response.data['message'] =  response.data['non_field_errors']
             response.content = json.dumps(response.data)
        
-        
         return response

@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.urls import include, path
-from core import views as index_views
+from system.core import views as index_views
+from system.core import api as core_api
 from rest_framework import routers
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
-from core import api as core_api
 
 router = routers.DefaultRouter()
 router.register('api/registration', core_api.RegistrationViewSet),

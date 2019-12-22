@@ -1,4 +1,5 @@
-from core.models import User
+from system.core.models import User
+from system.core.serializers import UserSerializer, RegistrationSerializer, UserMeSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
@@ -6,7 +7,6 @@ from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
-from core.serializers import UserSerializer, RegistrationSerializer, UserMeSerializer
 
 
 class RegistrationViewSet(viewsets.ModelViewSet):

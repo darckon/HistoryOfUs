@@ -4,7 +4,7 @@ import datetime
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '05dcpjeiw=gn5qo)tgj(m+)o!ly*1wqtdvoselghk#+=3blnop'
 DEBUG = True
-ALLOWED_HOSTS = ['192.168.0.12']
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -14,7 +14,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'core',
+    'system',
+    'system.core',
     'corsheaders'
 ]
 
@@ -27,7 +28,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'core.middleware.SimpleMiddleware',
+    'system.core.helpers.middleware.response.GenericResponseMiddleware'
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -99,7 +100,7 @@ JWT_AUTH = {
     'rest_framework_jwt.utils.jwt_get_user_id_from_payload_handler',
 
     'JWT_RESPONSE_PAYLOAD_HANDLER':
-    'helpers.utils.my_jwt_response_handler',
+    'system.core.helpers.utils.my_jwt_response_handler',
     #'rest_framework_jwt.utils.jwt_response_payload_handler',
 
     'JWT_SECRET_KEY': SECRET_KEY,

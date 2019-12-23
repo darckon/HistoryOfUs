@@ -7,7 +7,7 @@ import uuid
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, db_index=True, editable=False)
     #escenario = models.ManyToManyField('core.Escenario', related_name='escenarios')
-    personaje = models.ManyToManyField('core.Trama', related_name='personajes', through='core.Personaje')
+    personaje = models.ManyToManyField('core.Historia', related_name='personajes', through='core.Personaje')
     created_at = models.DateTimeField(("creado el"), auto_now_add=True)
     updated_at = models.DateTimeField(("actualizado el"), auto_now=True)
         
@@ -29,7 +29,7 @@ class User(AbstractUser):
 
 class Personaje(models.Model):
     user = models.ForeignKey("core.User", db_index=True, related_name='personaje_set', verbose_name=("usuario"), on_delete=models.CASCADE, unique=True)
-    trama = models.ForeignKey("core.Trama", db_index=True, related_name='personaje_set', verbose_name=("trama"), on_delete=models.CASCADE)
+    historia = models.ForeignKey("core.Historia", db_index=True, related_name='personaje_set', verbose_name=("historia"), on_delete=models.CASCADE)
     rol = models.ForeignKey('core.Rol', verbose_name=("Rol"), on_delete=models.CASCADE)
     created_at = models.DateTimeField(("creado el"), auto_now_add=True)
     updated_at = models.DateTimeField(("actualizado el"), auto_now=True)
@@ -55,30 +55,31 @@ class Rol(models.Model):
     def __str__(self):
         return self.nombre
 
-class Escenario(models.Model):
-    nombre = models.CharField('Escenario', max_length = 100)
+class Categoria_Historia(models.Model):
+    nombre = models.CharField('Nombre', max_length = 100)
     activa = models.BooleanField(default = True)
     created_at = models.DateTimeField(("creado el"), auto_now_add=True)
     updated_at = models.DateTimeField(("actualizado el"), auto_now=True)
 
     class Meta:
-        verbose_name = ("Escenario")
-        verbose_name_plural = ("Escenarios")
+        verbose_name = ("Categoria de Historia")
+        verbose_name_plural = ("Categoria de Historias")
 
     def __str__(self):
         return self.nombre
 
-class Trama(models.Model):
-    nombre = models.CharField('Trama' , max_length = 250)
-    escenario = models.ForeignKey(Escenario, on_delete=models.PROTECT)
+class Historia(models.Model):
+    nombre = models.CharField('Nombre' , max_length = 250)
+    categoria = models.ForeignKey(Categoria_Historia, on_delete=models.PROTECT)
     fecha_inicio = models.DateField('Fecha Inicio', null = True)
     fecha_termino = models.DateField('Fecha Termino', null = True)
+    activa = models.BooleanField(default = True)
     created_at = models.DateTimeField(("creado el"), auto_now_add=True)
     updated_at = models.DateTimeField(("actualizado el"), auto_now=True)
 
     class Meta:
-        verbose_name = ("Trama")
-        verbose_name_plural = ("Tramas")
+        verbose_name = ("Historia")
+        verbose_name_plural = ("Historias")
 
     def __str__(self):
         return self.nombre
@@ -86,7 +87,7 @@ class Trama(models.Model):
 class Texto(models.Model):
     nombre = models.CharField('Nombre', max_length = 100)
     texto = models.TextField('Texto')
-    trama = models.ForeignKey(Trama, on_delete=models.PROTECT)
+    historia = models.ForeignKey(Historia, on_delete=models.PROTECT)
     created_at = models.DateTimeField(("creado el"), auto_now_add=True)
     updated_at = models.DateTimeField(("actualizado el"), auto_now=True)
     
@@ -99,7 +100,7 @@ class Texto(models.Model):
 
 class Etapa(models.Model):
     nombre = models.CharField('Nombre' , max_length = 100)
-    trama = models.ForeignKey(Trama, on_delete=models.PROTECT)
+    historia = models.ForeignKey(Historia, on_delete=models.PROTECT)
     pregunta = models.ManyToManyField("core.Pregunta", related_name='etapa_preguntas', verbose_name='Pregunta(Perfil)')
     etapa_siguiente = models.ForeignKey("core.Etapa", related_name='siguiente', on_delete=models.PROTECT, null = True, blank=True)
     activa = models.BooleanField(default=False)

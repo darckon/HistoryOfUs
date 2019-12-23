@@ -1,5 +1,7 @@
 # -*- encoding: utf-8 -*-
-from system.core.models import User, Personaje
+from system.core.models import (
+    User, Personaje, Categoria_Historia,
+    Historia)
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import status
@@ -67,3 +69,18 @@ class RegistrationSerializer(serializers.ModelSerializer):
         user.email = self.context['request'].data['email']
         user.save()
         return user
+
+
+class CategoriaHistoriaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Categoria_Historia
+        fields = ('id','nombre', 'activa')
+
+
+class HistoriaSerializer(serializers.ModelSerializer):
+    categoria_set = CategoriaHistoriaSerializer(source='categoria', read_only=True)
+    class Meta:
+        model = Historia
+        fields = (
+            'id','nombre', 'categoria_set', 
+            'fecha_inicio', 'fecha_termino', 'activa')

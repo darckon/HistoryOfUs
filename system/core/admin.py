@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Escenario, Trama, Texto, Evento, Etapa, Tipo_Pregunta, Pregunta, Alternativa, Personaje, Rol
+from .models import User, Categoria_Historia, Historia, Texto, Evento, Etapa, Tipo_Pregunta, Pregunta, Alternativa, Personaje, Rol
 
 
 @admin.register(User)
@@ -16,25 +16,25 @@ class UsuarioAdmin(UserAdmin):
     readonly_fields = ['created_at', 'last_login', 'date_joined']
 
 
-class EscenarioAdmin(admin.ModelAdmin):
-    model = Escenario
+class CategoriaHistoriaAdmin(admin.ModelAdmin):
+    model = Categoria_Historia
     list_display = ('nombre', 'created_at', 'activa')
 
-class TramaAdmin(admin.ModelAdmin):
-    model = Trama
-    list_display = ('nombre', 'escenario', 'fecha_inicio', 'fecha_termino')
+class HistoriaAdmin(admin.ModelAdmin):
+    model = Historia
+    list_display = ('nombre', 'categoria', 'fecha_inicio', 'fecha_termino')
 
 class TextoAdmin(admin.ModelAdmin):
     model = Texto
-    list_display = ('nombre', 'get_escenario', 'trama')
+    list_display = ('nombre', 'get_categoria_historia', 'historia')
 
-    def get_escenario(self, obj):
-        return obj.trama.escenario
-    get_escenario.short_description = 'Escenario'
+    def get_categoria_historia(self, obj):
+        return obj.historia.categoria_historia
+    get_categoria_historia.short_description = 'Categoria historia'
 
 class EventoAdmin(admin.ModelAdmin):
     model = Evento
-    list_display = ('nombre', 'get_escenario', 'get_trama', 'etapa', 'fecha')
+    list_display = ('nombre', 'get_categoria_historia', 'get_historia', 'etapa', 'fecha')
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         EVENTO = 2
@@ -42,18 +42,18 @@ class EventoAdmin(admin.ModelAdmin):
             kwargs["queryset"] = Pregunta.objects.filter(tipo_pregunta = EVENTO)
         return super(EventoAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
-    def get_escenario(self, obj):
-        return obj.etapa.trama.escenario
+    def get_categoria_historia(self, obj):
+        return obj.etapa.historia.categoria_historia
 
-    def get_trama(self, obj):
-        return obj.etapa.trama
+    def get_historia(self, obj):
+        return obj.etapa.historia
 
-    get_escenario.short_description = 'Escenario'
-    get_trama.short_description = 'Trama'
+    get_categoria_historia.short_description = 'Categoria historia'
+    get_historia.short_description = 'Historia'
 
 class EtapaAdmin(admin.ModelAdmin):
     model = Etapa
-    list_display = ('nombre', 'get_escenario', 'trama', 'activa', 'etapa_siguiente', 'fecha_inicio', 'fecha_termino')
+    list_display = ('nombre', 'get_categoria_historia', 'historia', 'activa', 'etapa_siguiente', 'fecha_inicio', 'fecha_termino')
     ordering = ('fecha_inicio',)
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
@@ -62,9 +62,9 @@ class EtapaAdmin(admin.ModelAdmin):
            kwargs["queryset"] = Pregunta.objects.filter(tipo_pregunta = PERFIL)
         return super(EtapaAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
         
-    def get_escenario(self, obj):
-        return obj.trama.escenario
-    get_escenario.short_description = 'Escenario'
+    def get_categoria_historia(self, obj):
+        return obj.historia.categoria_historia
+    get_categoria_historia.short_description = 'Categoria historia'
 
 class PreguntaAdmin(admin.ModelAdmin):
     model = Pregunta
@@ -82,8 +82,8 @@ class AlternativaAdmin(admin.ModelAdmin):
     model = Alternativa
     list_display = ('descripcion', 'pregunta')
 
-admin.site.register(Escenario, EscenarioAdmin)
-admin.site.register(Trama, TramaAdmin)
+admin.site.register(Categoria_Historia, CategoriaHistoriaAdmin)
+admin.site.register(Historia, HistoriaAdmin)
 admin.site.register(Texto, TextoAdmin)
 admin.site.register(Evento, EventoAdmin)
 admin.site.register(Etapa, EtapaAdmin)

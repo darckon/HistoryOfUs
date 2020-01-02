@@ -1,8 +1,9 @@
 from system.core.models import (
-    User, Categoria_Historia, Historia)
+    User, Categoria_Historia, Historia,
+    Pregunta)
 from system.core.serializers import (
     UserSerializer, RegistrationSerializer, UserMeSerializer,
-    CategoriaHistoriaSerializer, HistoriaSerializer)
+    CategoriaHistoriaSerializer, HistoriaSerializer, PreguntaSerializer)
 from django_filters.rest_framework import DjangoFilterBackend
 from url_filter.integrations.drf import DjangoFilterBackend as UrlDjangoFilterBackend
 from rest_framework.decorators import list_route
@@ -48,5 +49,13 @@ class HistoriaViewSet(viewsets.ModelViewSet):
     authentication_classes = (JSONWebTokenAuthentication,)
     queryset = Historia.objects.all()
     serializer_class = HistoriaSerializer
+    filter_fields = '__all__'
+    filter_backends = (UrlDjangoFilterBackend,)
+
+
+class PreguntasViewSet(viewsets.ModelViewSet):
+    authentication_classes = (JSONWebTokenAuthentication,)
+    queryset = Pregunta.objects.all()
+    serializer_class = PreguntaSerializer
     filter_fields = '__all__'
     filter_backends = (UrlDjangoFilterBackend,)

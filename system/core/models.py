@@ -145,6 +145,7 @@ class Tipo_Pregunta(models.Model):
 
 
 class Pregunta(models.Model):
+    nombre = models.CharField('Titulo', max_length = 100)
     descripcion = models.TextField('Descripcion')
     tipo_pregunta = models.ForeignKey(Tipo_Pregunta, on_delete=models.PROTECT)
     rol = models.ManyToManyField(Rol, related_name='roles')
@@ -154,11 +155,12 @@ class Pregunta(models.Model):
     updated_at = models.DateTimeField(("actualizado el"), auto_now=True)
 
     class Meta:
+        ordering = ['orden']
         verbose_name = ("Pregunta")
         verbose_name_plural = ("Preguntas")
 
     def __str__(self):
-        return self.descripcion
+        return self.nombre
 
 class Alternativa(models.Model):
     descripcion = models.TextField('Descripcion')

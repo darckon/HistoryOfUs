@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 from system.core.models import (
     User, Personaje, Categoria_Historia,
-    Historia)
+    Historia, Pregunta, Alternativa)
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import status
@@ -84,3 +84,20 @@ class HistoriaSerializer(serializers.ModelSerializer):
         fields = (
             'id','nombre', 'categoria_set', 
             'fecha_inicio', 'fecha_termino', 'activa')
+
+
+
+class AlternativaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Alternativa
+        fields = (
+            'id','descripcion',)
+
+
+class PreguntaSerializer(serializers.ModelSerializer):
+    alternativas_set = AlternativaSerializer(source='alternativas', many=True, read_only=True)
+    class Meta:
+        model = Pregunta
+        fields = (
+            'descripcion','tipo_pregunta', 'rol', 
+            'alternativas_set', 'orden')

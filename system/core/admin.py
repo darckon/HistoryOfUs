@@ -29,7 +29,7 @@ class TextoAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'get_categoria_historia', 'historia')
 
     def get_categoria_historia(self, obj):
-        return obj.historia.categoria_historia
+        return obj.historia.categoria
     get_categoria_historia.short_description = 'Categoria historia'
 
 class EventoAdmin(admin.ModelAdmin):
@@ -43,7 +43,7 @@ class EventoAdmin(admin.ModelAdmin):
         return super(EventoAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
     def get_categoria_historia(self, obj):
-        return obj.etapa.historia.categoria_historia
+        return obj.etapa.historia.categoria
 
     def get_historia(self, obj):
         return obj.etapa.historia
@@ -63,12 +63,12 @@ class EtapaAdmin(admin.ModelAdmin):
         return super(EtapaAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
         
     def get_categoria_historia(self, obj):
-        return obj.historia.categoria_historia
+        return obj.historia.categoria
     get_categoria_historia.short_description = 'Categoria historia'
 
 class PreguntaAdmin(admin.ModelAdmin):
     model = Pregunta
-    list_display = ('descripcion', 'tipo_pregunta')
+    list_display = ('nombre', 'tipo_pregunta')
     ordering = ['orden',]
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
@@ -80,7 +80,15 @@ class PreguntaAdmin(admin.ModelAdmin):
 
 class AlternativaAdmin(admin.ModelAdmin):
     model = Alternativa
-    list_display = ('descripcion', 'pregunta')
+    list_display = ('descripcion', 'get_pregunta')
+    list_filter = ('pregunta__tipo_pregunta__nombre',)
+    search_fields = ('descripcion',)
+    list_per_page = 20
+
+    def get_pregunta(self, obj):
+        return obj.pregunta.nombre
+    get_pregunta.short_description = 'Pregunta'
+
 
 admin.site.register(Categoria_Historia, CategoriaHistoriaAdmin)
 admin.site.register(Historia, HistoriaAdmin)

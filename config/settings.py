@@ -16,7 +16,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'system',
     'system.core',
-    'corsheaders'
+    'corsheaders',
+    'ckeditor'
 ]
 
 MIDDLEWARE = [
@@ -56,7 +57,7 @@ DATABASES = {
 			'ENGINE': 'django.db.backends.postgresql',
 			'NAME': 'historyofus',
 			'USER': 'postgres',
-			'PASSWORD': '794613..',
+			'PASSWORD': '794613..c',
 			'HOST': '127.0.0.1',
 			'PORT': '5432',
 	}
@@ -120,6 +121,20 @@ JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
     'JWT_AUTH_COOKIE': None,
 
+}
+
+CKEDITOR_CONFIGS = {
+    'awesome_ckeditor': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            {'name': 'styles', 'items': ['Styles', 'Format', 'Font', 'FontSize']},
+            '/',
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+            ['Link', 'Unlink'],
+            ['RemoveFormat', 'Preview', 'Source']
+        ]
+    },
 }
 
 

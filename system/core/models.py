@@ -176,3 +176,37 @@ class Alternativa(models.Model):
         return self.descripcion
 
 
+class Movimientos(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.PROTECT)
+    respuestas = models.ManyToManyField(
+        'core.Pregunta',
+        through='core.Respuestas')
+    created_at = models.DateTimeField(("creado el"), auto_now_add=True)
+    updated_at = models.DateTimeField(("actualizado el"), auto_now=True) 
+
+    class Meta:
+        verbose_name = ("Movimiento")
+        verbose_name_plural = ("Movimientos")
+
+    def __str__(self):
+        return self.usuario
+
+
+class Respuestas(models.Model):
+    pregunta = models.ForeignKey(Pregunta, db_index=True,
+        on_delete=models.CASCADE,
+        related_name='core_pregunta_respuesta_set')
+    alternativa = models.ForeignKey(Alternativa,db_index=True,
+        on_delete=models.CASCADE,
+        related_name='core_pregunta_respuesta_set')
+    movimiento = models.ForeignKey(Movimientos, db_index=True,
+        on_delete=models.CASCADE,
+        related_name='core_pregunta_respuesta_set')
+    created_at = models.DateTimeField(("creado el"), auto_now_add=True)
+    updated_at = models.DateTimeField(("actualizado el"), auto_now=True)
+
+    class Meta:
+        verbose_name = ("Movimiento")
+        verbose_name_plural = ("Movimientos")
+
+

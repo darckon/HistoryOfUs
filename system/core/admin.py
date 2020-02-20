@@ -1,6 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Categoria_Historia, Historia, Texto, Evento, Etapa, Tipo_Pregunta, Pregunta, Alternativa, Personaje, Rol
+from .models import (
+    User, Categoria_Historia, Historia, 
+    Texto, Evento, Etapa, Tipo_Pregunta, 
+    Pregunta, Alternativa, Personaje, Rol,
+    Capitulos)
 
 
 @admin.register(User)
@@ -26,11 +30,18 @@ class HistoriaAdmin(admin.ModelAdmin):
 
 class TextoAdmin(admin.ModelAdmin):
     model = Texto
-    list_display = ('nombre', 'get_categoria_historia', 'historia')
+    list_display = ('nombre', 'get_categoria_historia', 'capitulo')
 
     def get_categoria_historia(self, obj):
-        return obj.historia.categoria
+        return obj.capitulo.historia.categoria
     get_categoria_historia.short_description = 'Categoria historia'
+
+
+@admin.register(Capitulos)
+class CapitulosAdmin(admin.ModelAdmin):
+    model = Capitulos
+    list_display = ('nombre', 'historia', 'created_at')
+
 
 class EventoAdmin(admin.ModelAdmin):
     model = Evento

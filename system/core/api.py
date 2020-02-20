@@ -6,7 +6,7 @@ from system.core.serializers import (
     CategoriaHistoriaSerializer, HistoriaSerializer, PreguntaSerializer)
 from django_filters.rest_framework import DjangoFilterBackend
 from url_filter.integrations.drf import DjangoFilterBackend as UrlDjangoFilterBackend
-from rest_framework.decorators import list_route
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
@@ -28,7 +28,7 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_fields = '__all__'
     filter_backends = (DjangoFilterBackend,)
     
-    @list_route(methods=['get'], url_path='me')
+    @action(detail=False, methods=['get'], url_path='me')
     def getUser(self, request):
         user = User.objects.get(pk = request.user.pk)
         serializer = UserMeSerializer(user)

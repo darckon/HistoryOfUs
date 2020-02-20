@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from ckeditor.fields import RichTextField
 import uuid
 
 # Create your models here.
@@ -73,6 +74,7 @@ class Historia(models.Model):
     categoria = models.ForeignKey(Categoria_Historia, on_delete=models.PROTECT)
     fecha_inicio = models.DateField('Fecha Inicio', null = True)
     fecha_termino = models.DateField('Fecha Termino', null = True)
+    #capitulos = models.ManyToManyField("core.Capitulos", verbose_name='capitulos')
     activa = models.BooleanField(default = True)
     created_at = models.DateTimeField(("creado el"), auto_now_add=True)
     updated_at = models.DateTimeField(("actualizado el"), auto_now=True)
@@ -86,17 +88,39 @@ class Historia(models.Model):
 
 class Texto(models.Model):
     nombre = models.CharField('Nombre', max_length = 100)
-    texto = models.TextField('Texto')
-    historia = models.ForeignKey(Historia, on_delete=models.PROTECT)
+    texto = RichTextField('Texto', config_name='awesome_ckeditor')
+    pregunta = models.ManyToManyField("core.Pregunta", blank=True, null=True)
+    capitulo = models.ForeignKey(
+        "core.Capitulos", on_delete=models.CASCADE)
+    orden = models.IntegerField("Orden", null=True)
     created_at = models.DateTimeField(("creado el"), auto_now_add=True)
     updated_at = models.DateTimeField(("actualizado el"), auto_now=True)
     
     class Meta:
         verbose_name = ("Texto")
         verbose_name_plural = ("Textos")
+        ordering = ['orden']
+
     
     def __str__(self):
         return self.nombre
+
+
+class Capitulos(models.Model):
+    nombre = models.CharField('Nombre', max_length = 100)
+    historia = models.ForeignKey('core.Historia', on_delete=models.CASCADE)
+    orden = models.IntegerField("Orden", null=True)
+    created_at = models.DateTimeField(("creado el"), auto_now_add=True)
+    updated_at = models.DateTimeField(("actualizado el"), auto_now=True)
+    
+    class Meta:
+        verbose_name = ("Capitulo")
+        verbose_name_plural = ("Capitulos")
+        ordering = ['orden']
+        
+    
+    def __str__(self):
+        return "%s :: %s" % (self.nombre, self.historia)
 
 class Etapa(models.Model):
     nombre = models.CharField('Nombre' , max_length = 100)
@@ -146,9 +170,9 @@ class Tipo_Pregunta(models.Model):
 
 class Pregunta(models.Model):
     nombre = models.CharField('Titulo', max_length = 100)
-    descripcion = models.TextField('Descripcion')
+    descripcion = RichTextField('Descripcion', config_name='awesome_ckeditor')
     tipo_pregunta = models.ForeignKey(Tipo_Pregunta, on_delete=models.PROTECT)
-    rol = models.ManyToManyField(Rol, related_name='roles')
+    rol = models.ManyToManyField(Rol, related_name='roles', blank=True)
     alternativas = models.ManyToManyField("core.Alternativa", related_name='alternativas')
     orden = models.IntegerField("Orden", null=True)
     created_at = models.DateTimeField(("creado el"), auto_now_add=True)
@@ -163,8 +187,15 @@ class Pregunta(models.Model):
         return self.nombre
 
 class Alternativa(models.Model):
-    descripcion = models.TextField('Descripcion')
+    # Alternatives Choices
+    TRANSACTION_CHOICES = [
+        (0, 'STRING'),
+        (1, 'INPUT')
+    ]
+    descripcion = RichTextField('Descripcion', config_name='awesome_ckeditor')
     pregunta = models.ForeignKey(Pregunta, on_delete=models.PROTECT, blank=True, null=True)
+    tipo_alternativa = models.IntegerField(
+        'Tipo alternativa', choices=TRANSACTION_CHOICES, default=1)
     created_at = models.DateTimeField(("creado el"), auto_now_add=True)
     updated_at = models.DateTimeField(("actualizado el"), auto_now=True)
 
@@ -174,5 +205,17 @@ class Alternativa(models.Model):
 
     def __str__(self):
         return self.descripcion
+
+
+class TipoAlternativa(models.Model):
+    nombre = models.CharField('Nombre', max_length = 100)
+
+    class Meta:
+        verbose_name = ("Tipo Alternativa")
+        verbose_name_plural = ("Tipos de Alternativas")
+
+    def __str__(self):
+        return self.nombre
+
 
 

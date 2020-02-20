@@ -29,7 +29,7 @@ class User(AbstractUser):
         verbose_name_plural = ("Usuarios")
 
 class Personaje(models.Model):
-    user = models.ForeignKey("core.User", db_index=True, related_name='personaje_set', verbose_name=("usuario"), on_delete=models.CASCADE, unique=True)
+    user = models.OneToOneField("core.User", db_index=True, related_name='personaje_set', verbose_name=("usuario"), on_delete=models.CASCADE)
     historia = models.ForeignKey("core.Historia", db_index=True, related_name='personaje_set', verbose_name=("historia"), on_delete=models.CASCADE)
     rol = models.ForeignKey('core.Rol', verbose_name=("Rol"), on_delete=models.CASCADE)
     created_at = models.DateTimeField(("creado el"), auto_now_add=True)
@@ -89,7 +89,7 @@ class Historia(models.Model):
 class Texto(models.Model):
     nombre = models.CharField('Nombre', max_length = 100)
     texto = RichTextField('Texto', config_name='awesome_ckeditor')
-    pregunta = models.ManyToManyField("core.Pregunta", blank=True, null=True)
+    pregunta = models.ManyToManyField("core.Pregunta", blank=True)
     capitulo = models.ForeignKey(
         "core.Capitulos", on_delete=models.CASCADE)
     orden = models.IntegerField("Orden", null=True)

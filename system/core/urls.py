@@ -8,6 +8,7 @@ router.register('api/v1/users', core_api.UserViewSet),
 router.register('api/v1/story_category', core_api.StoryCategoryViewSet),
 router.register('api/v1/stories', core_api.StoryViewSet),
 router.register('api/v1/questions', core_api.QuestionViewSet),
+router.register('api/v1/texts', core_api.TextsViewSet),
 router.register('api/v1/movimientos', core_api.MovementViewSet),
 
 

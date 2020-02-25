@@ -1,10 +1,10 @@
 from system.core.models import (
     User, Story_Category, Story,
-    Question, Movement, Answer)
+    Question, Movement, Answer, Text)
 from system.core.serializers import (
     UserSerializer, RegistrationSerializer, UserMeSerializer,
     StoryCategorySerializer, StorySerializer, QuestionSerializer,
-    MovementSerializer, AnswerSerializer)
+    MovementSerializer, AnswerSerializer, TextsSerializer)
 from system.core.helpers.utils import created_http_201
 from django_filters.rest_framework import DjangoFilterBackend
 from url_filter.integrations.drf import DjangoFilterBackend as UrlDjangoFilterBackend
@@ -59,6 +59,14 @@ class QuestionViewSet(viewsets.ModelViewSet):
     authentication_classes = (JSONWebTokenAuthentication,)
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
+    filter_fields = '__all__'
+    filter_backends = (UrlDjangoFilterBackend,)
+
+
+class TextsViewSet(viewsets.ModelViewSet):
+    authentication_classes = (JSONWebTokenAuthentication,)
+    queryset = Text.objects.all()
+    serializer_class = TextsSerializer
     filter_fields = '__all__'
     filter_backends = (UrlDjangoFilterBackend,)
 

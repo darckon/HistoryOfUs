@@ -1,7 +1,8 @@
 # -*- encoding: utf-8 -*-
 from system.core.models import (
     User, Character, Story_Category, Story,
-    Question, Alternative, Movement, Answer)
+    Question, Alternative, Movement, Answer,
+    Text)
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import status
@@ -35,10 +36,10 @@ class CharacterSerializer(serializers.ModelSerializer):
         fields = ('id', 'escenario_id', 'escenario_nombre', 'trama_id', 'trama_nombre', 'rol_id', 'rol_nombre')
 
 class UserMeSerializer(serializers.ModelSerializer):
-    personaje = CharacterSerializer(source='personaje_set', many=True)
+    character = CharacterSerializer(source='character_set', many=True)
     class Meta:
         model = User
-        fields = ('id','username','email', 'personaje')
+        fields = ('id','username','email', 'character')
 
 class RegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
@@ -101,6 +102,15 @@ class QuestionSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'description','question_type', 
             'rol', 'alternatives_set', 'order')
+
+
+class TextsSerializer(serializers.ModelSerializer):
+    question_set = QuestionSerializer(source='question', many=True)
+    class Meta:
+        model = Text
+        fields = (
+            'id', 'description','question_set', 
+            'chapter', 'order')
 
 
 class MovementSerializer(serializers.ModelSerializer):

@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 from system.core.models import (
-    User, Personaje, Categoria_Historia, Historia,
-    Pregunta, Alternativa, Movimientos, Respuestas)
+    User, Character, Story_Category, Story,
+    Question, Alternative, Movement, Answer)
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import status
@@ -23,7 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
 		model = User
 		fields = '__all__'
 
-class PersonajeSerializer(serializers.ModelSerializer):
+class CharacterSerializer(serializers.ModelSerializer):
     escenario_id = serializers.ReadOnlyField(source='trama.escenario.id')
     escenario_nombre = serializers.ReadOnlyField(source='trama.escenario.nombre')
     trama_id = serializers.ReadOnlyField(source='trama.id')
@@ -31,11 +31,11 @@ class PersonajeSerializer(serializers.ModelSerializer):
     rol_id = serializers.ReadOnlyField(source='rol.id')
     rol_nombre = serializers.ReadOnlyField(source='rol.nombre')
     class Meta:
-        model = Personaje
+        model = Character
         fields = ('id', 'escenario_id', 'escenario_nombre', 'trama_id', 'trama_nombre', 'rol_id', 'rol_nombre')
 
 class UserMeSerializer(serializers.ModelSerializer):
-    personaje = PersonajeSerializer(source='personaje_set', many=True)
+    personaje = CharacterSerializer(source='personaje_set', many=True)
     class Meta:
         model = User
         fields = ('id','username','email', 'personaje')
@@ -71,48 +71,48 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return user
 
 
-class CategoriaHistoriaSerializer(serializers.ModelSerializer):
+class StoryCategorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = Categoria_Historia
-        fields = ('id','nombre', 'activa')
+        model = Story_Category
+        fields = ('id','name', 'active')
 
 
-class HistoriaSerializer(serializers.ModelSerializer):
-    categoria_set = CategoriaHistoriaSerializer(source='categoria', read_only=True)
+class StorySerializer(serializers.ModelSerializer):
+    category_set = StoryCategorySerializer(source='category', read_only=True)
     class Meta:
-        model = Historia
+        model = Story
         fields = (
-            'id','nombre', 'categoria_set', 
-            'fecha_inicio', 'fecha_termino', 'activa')
+            'id','name', 'category_set', 
+            'start_date', 'end_date', 'active')
 
 
 
-class AlternativaSerializer(serializers.ModelSerializer):
+class AlternativeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Alternativa
+        model = Alternative
         fields = (
-            'id','descripcion',)
+            'id','description',)
 
 
-class PreguntaSerializer(serializers.ModelSerializer):
-    alternativas_set = AlternativaSerializer(source='alternativas', many=True, read_only=True)
+class QuestionSerializer(serializers.ModelSerializer):
+    alternatives_set = AlternativeSerializer(source='alternatives', many=True, read_only=True)
     class Meta:
-        model = Pregunta
+        model = Question
         fields = (
-            'id', 'descripcion','tipo_pregunta', 
-            'rol', 'alternativas_set', 'orden')
+            'id', 'description','question_type', 
+            'rol', 'alternatives_set', 'order')
 
 
-class MovimientosSerializer(serializers.ModelSerializer):
+class MovementSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Movimientos
+        model = Movement
         fields = (
-            'id', 'usuario')
+            'id', 'user')
 
 
-class RespuestasSerializer(serializers.ModelSerializer):
+class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Respuestas
+        model = Answer
         fields = (
-            'id', 'pregunta', 'alternativa',
-            'movimiento')
+            'id', 'question', 'alternative',
+            'movement')

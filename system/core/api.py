@@ -1,10 +1,10 @@
 from system.core.models import (
-    User, Categoria_Historia, Historia,
-    Pregunta, Movimientos, Respuestas)
+    User, Story_Category, Story,
+    Question, Movement, Answer)
 from system.core.serializers import (
     UserSerializer, RegistrationSerializer, UserMeSerializer,
-    CategoriaHistoriaSerializer, HistoriaSerializer, PreguntaSerializer,
-    MovimientosSerializer, RespuestasSerializer)
+    StoryCategorySerializer, StorySerializer, QuestionSerializer,
+    MovementSerializer, AnswerSerializer)
 from system.core.helpers.utils import created_http_201
 from django_filters.rest_framework import DjangoFilterBackend
 from url_filter.integrations.drf import DjangoFilterBackend as UrlDjangoFilterBackend
@@ -39,57 +39,57 @@ class UserViewSet(viewsets.ModelViewSet):
         return response
 
 
-class CategoriaHistoriaViewSet(viewsets.ModelViewSet):
+class StoryCategoryViewSet(viewsets.ModelViewSet):
     authentication_classes = (JSONWebTokenAuthentication,)
-    queryset = Categoria_Historia.objects.all()
-    serializer_class = CategoriaHistoriaSerializer
+    queryset = Story_Category.objects.all()
+    serializer_class = StoryCategorySerializer
     filter_fields = '__all__'
     filter_backends = (UrlDjangoFilterBackend,)
 
 
-class HistoriaViewSet(viewsets.ModelViewSet):
+class StoryViewSet(viewsets.ModelViewSet):
     authentication_classes = (JSONWebTokenAuthentication,)
-    queryset = Historia.objects.all()
-    serializer_class = HistoriaSerializer
+    queryset = Story.objects.all()
+    serializer_class = StorySerializer
     filter_fields = '__all__'
     filter_backends = (UrlDjangoFilterBackend,)
 
 
-class PreguntasViewSet(viewsets.ModelViewSet):
+class QuestionViewSet(viewsets.ModelViewSet):
     authentication_classes = (JSONWebTokenAuthentication,)
-    queryset = Pregunta.objects.all()
-    serializer_class = PreguntaSerializer
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
     filter_fields = '__all__'
     filter_backends = (UrlDjangoFilterBackend,)
 
 
-class MovimientosViewSet(viewsets.ModelViewSet):
+class MovementViewSet(viewsets.ModelViewSet):
     authentication_classes = (JSONWebTokenAuthentication,)
-    queryset = Movimientos.objects.all()
-    serializer_class = MovimientosSerializer
+    queryset = Movement.objects.all()
+    serializer_class = MovementSerializer
     filter_fields = '__all__'
     filter_backends = (UrlDjangoFilterBackend,)
 
     def create(self, request):
         data = request.data
         try:
-            movimiento = Movimientos.objects.create(
+            movement = Movement.objects.create(
                 usuario_id=data['usuario']
             )
             for respuesta in data['respuestas']:
-                Respuestas.objects.create(
+                Answer.objects.create(
                     pregunta_id=respuesta['pregunta_id'],
                     alternativa_id=respuesta['alternativa_id'],
-                    movimiento=movimiento,
+                    movimiento=movement,
                 )
             return created_http_201('SUCCESS')
         except Exception as e:
             raise APIException()
 
 
-class RespuestasViewSet(viewsets.ModelViewSet):
+class AnswerViewSet(viewsets.ModelViewSet):
     authentication_classes = (JSONWebTokenAuthentication,)
-    queryset = Respuestas.objects.all()
-    serializer_class = RespuestasSerializer
+    queryset = Answer.objects.all()
+    serializer_class = AnswerSerializer
     filter_fields = '__all__'
     filter_backends = (UrlDjangoFilterBackend,)

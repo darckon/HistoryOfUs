@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import (
-    User, Categoria_Historia, Historia, 
-    Texto, Evento, Etapa, Tipo_Pregunta, 
-    Pregunta, Alternativa, Personaje, Rol,
-    Capitulos)
+    User, Story_Category, Story, 
+    Text, Event, Step, QuestionType, 
+    Question, Alternative, Character, Rol,
+    Chapter)
 
 
 @admin.register(User)
@@ -20,94 +20,99 @@ class UsuarioAdmin(UserAdmin):
     readonly_fields = ['created_at', 'last_login', 'date_joined']
 
 
-class CategoriaHistoriaAdmin(admin.ModelAdmin):
-    model = Categoria_Historia
-    list_display = ('nombre', 'created_at', 'activa')
-
-class HistoriaAdmin(admin.ModelAdmin):
-    model = Historia
-    list_display = ('nombre', 'categoria', 'fecha_inicio', 'fecha_termino')
-
-class TextoAdmin(admin.ModelAdmin):
-    model = Texto
-    list_display = ('nombre', 'get_categoria_historia', 'capitulo')
-
-    def get_categoria_historia(self, obj):
-        return obj.capitulo.historia.categoria
-    get_categoria_historia.short_description = 'Categoria historia'
+@admin.register(Story_Category)
+class StoryCategoryAdmin(admin.ModelAdmin):
+    model = Story_Category
+    list_display = ('name', 'created_at', 'active')
 
 
-@admin.register(Capitulos)
-class CapitulosAdmin(admin.ModelAdmin):
-    model = Capitulos
-    list_display = ('nombre', 'historia', 'created_at')
+@admin.register(Story)
+class StoryAdmin(admin.ModelAdmin):
+    model = Story
+    list_display = ('name', 'category', 'start_date', 'end_date')
 
 
-class EventoAdmin(admin.ModelAdmin):
-    model = Evento
-    list_display = ('nombre', 'get_categoria_historia', 'get_historia', 'etapa', 'fecha')
+@admin.register(Text)
+class TextAdmin(admin.ModelAdmin):
+    model = Text
+    list_display = ('name', 'get_story_category', 'chapter')
+
+    def get_story_category(self, obj):
+        return obj.chapter.story.category
+    get_story_category.short_description = 'Categoria historia'
+
+
+@admin.register(Chapter)
+class ChapterAdmin(admin.ModelAdmin):
+    model = Chapter
+    list_display = ('name', 'story', 'created_at')
+
+
+@admin.register(Event)
+class EventAdmin(admin.ModelAdmin):
+    model = Event
+    list_display = ('name', 'get_story_category', 'get_story', 'step', 'date')
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
-        EVENTO = 2
-        if db_field.name == "pregunta":
-            kwargs["queryset"] = Pregunta.objects.filter(tipo_pregunta = EVENTO)
-        return super(EventoAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+        EVENT = 2
+        if db_field.name == "question":
+            kwargs["queryset"] = Question.objects.filter(question_type = EVENT)
+        return super(EventAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
-    def get_categoria_historia(self, obj):
-        return obj.etapa.historia.categoria
+    def get_story_category(self, obj):
+        return obj.step.story.category
 
-    def get_historia(self, obj):
-        return obj.etapa.historia
+    def get_story(self, obj):
+        return obj.step.story
 
-    get_categoria_historia.short_description = 'Categoria historia'
-    get_historia.short_description = 'Historia'
+    get_story_category.short_description = 'Categoria historia'
+    get_story.short_description = 'Historia'
 
-class EtapaAdmin(admin.ModelAdmin):
-    model = Etapa
-    list_display = ('nombre', 'get_categoria_historia', 'historia', 'activa', 'etapa_siguiente', 'fecha_inicio', 'fecha_termino')
-    ordering = ('fecha_inicio',)
+
+@admin.register(Step)
+class StepAdmin(admin.ModelAdmin):
+    model = Step
+    list_display = ('name', 'get_story_category', 'story', 'active', 'next_step', 'start_date', 'end_date')
+    ordering = ('start_date',)
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         PERFIL = 1
         if db_field.name == "pregunta":
-           kwargs["queryset"] = Pregunta.objects.filter(tipo_pregunta = PERFIL)
-        return super(EtapaAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+           kwargs["queryset"] = Question.objects.filter(question_type = PERFIL)
+        return super(StepAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
         
-    def get_categoria_historia(self, obj):
-        return obj.historia.categoria
-    get_categoria_historia.short_description = 'Categoria historia'
+    def get_story_category(self, obj):
+        return obj.story.category
+    get_story_category.short_description = 'Categoria historia'
 
-class PreguntaAdmin(admin.ModelAdmin):
-    model = Pregunta
-    list_display = ('nombre', 'tipo_pregunta')
-    ordering = ['orden',]
+
+@admin.register(Question)
+class QuestionAdmin(admin.ModelAdmin):
+    model = Question
+    list_display = ('name', 'question_type')
+    ordering = ['order',]
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if request.resolver_match.kwargs:
             pregunta_id = int(request.resolver_match.kwargs['object_id'])
-            if db_field.name == "alternativas":
-                kwargs["queryset"] = Alternativa.objects.filter(pregunta = pregunta_id)
-            return super(PreguntaAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+            if db_field.name == "alternatives":
+                kwargs["queryset"] = Alternative.objects.filter(question = pregunta_id)
+            return super(QuestionAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
-class AlternativaAdmin(admin.ModelAdmin):
-    model = Alternativa
-    list_display = ('descripcion', 'get_pregunta')
-    list_filter = ('pregunta__tipo_pregunta__nombre',)
-    search_fields = ('descripcion',)
+
+@admin.register(Alternative)
+class AlternativeAdmin(admin.ModelAdmin):
+    model = Alternative
+    list_display = ('description', 'get_question')
+    list_filter = ('question__question_type__name',)
+    search_fields = ('description',)
     list_per_page = 20
 
-    def get_pregunta(self, obj):
-        return obj.pregunta.nombre
-    get_pregunta.short_description = 'Pregunta'
+    def get_question(self, obj):
+        return obj.question.name
+    get_question.short_description = 'Pregunta'
 
 
-admin.site.register(Categoria_Historia, CategoriaHistoriaAdmin)
-admin.site.register(Historia, HistoriaAdmin)
-admin.site.register(Texto, TextoAdmin)
-admin.site.register(Evento, EventoAdmin)
-admin.site.register(Etapa, EtapaAdmin)
-admin.site.register(Tipo_Pregunta)
-admin.site.register(Pregunta, PreguntaAdmin)
-admin.site.register(Alternativa, AlternativaAdmin)
-admin.site.register(Personaje)
+admin.site.register(QuestionType)
+admin.site.register(Character)
 admin.site.register(Rol)

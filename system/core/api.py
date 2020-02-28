@@ -1,6 +1,6 @@
 from system.core.models import (
-    User, Story_Category, Story,
-    Question, Movement, Answer, Text)
+    User, Story_Category, Story, Question,
+    Movement, Answer, Text, Character)
 from system.core.serializers import (
     UserSerializer, RegistrationSerializer, UserMeSerializer,
     StoryCategorySerializer, StorySerializer, QuestionSerializer,
@@ -14,6 +14,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.exceptions import APIException
 from rest_framework import status, viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from django.db import transaction as atomic_transaction
+from config.constants import MOVEMENT_TYPE
+
 
 
 class RegistrationViewSet(viewsets.ModelViewSet):
@@ -80,19 +84,40 @@ class MovementViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         data = request.data
+        
         try:
-            movement = Movement.objects.create(
-                usuario_id=data['usuario']
-            )
-            for respuesta in data['respuestas']:
-                Answer.objects.create(
-                    pregunta_id=respuesta['pregunta_id'],
-                    alternativa_id=respuesta['alternativa_id'],
-                    movimiento=movement,
+            with atomic_transaction.atomic():
+
+                movement = Movement.objects.create(
+                    user_id=data['user'],
+                    movement_type = data['movement_type']
                 )
-            return created_http_201('SUCCESS')
+                
+                if movement.movement_type == MOVEMENT_TYPE['INITIAL_CHARACTER_CONFIGURATION']:
+                    for value in data['answers']:
+                        found_duplicate_question = Answer.objects.filter(
+                            question_id= value['question_id'],
+                            movement__user= data['user']).first()
+                        if found_duplicate_question:
+                            raise APIException('duplicado')
+                    
+                        Character.objects.create(
+                            name = vale['']
+                        )   
+
+                        Answer.objects.create(
+                            question_id=value['question_id'],
+                            alternative_id=value['alternative_id'],
+                            movement=movement,
+                        )
+
+                return created_http_201('SUCCESS')
         except Exception as e:
-            raise APIException()
+            print('pase')
+            print(e)
+            atomic_transaction.rollback()
+            print('yep')
+            raise APIException(e)
 
 
 class AnswerViewSet(viewsets.ModelViewSet):

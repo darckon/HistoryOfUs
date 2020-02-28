@@ -101,7 +101,8 @@ class QuestionSerializer(serializers.ModelSerializer):
         model = Question
         fields = (
             'id', 'description','question_type', 
-            'rol', 'alternatives_set', 'order')
+            'rol', 'alternatives_set', 'alternative_type', 
+            'order')
 
 
 class TextsSerializer(serializers.ModelSerializer):

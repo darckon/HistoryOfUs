@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from ckeditor.fields import RichTextField
 import uuid
+from config.constants import HELP_TEXT
 
 # Create your models here.
 
@@ -172,6 +173,9 @@ class Question(models.Model):
     name = models.CharField('Titulo', max_length = 100)
     description = RichTextField('Descripcion', config_name='awesome_ckeditor')
     question_type = models.ForeignKey(QuestionType, on_delete=models.PROTECT)
+    alternative_type = models.ForeignKey(
+        'core.AlternativeType', default=1,
+        help_text=HELP_TEXT, on_delete=models.CASCADE, null=True)
     rol = models.ManyToManyField(Rol, related_name='roles', blank=True)
     alternatives = models.ManyToManyField("core.Alternative", related_name='alternativas')
     order = models.IntegerField("Orden", null=True)
@@ -187,15 +191,8 @@ class Question(models.Model):
         return self.name
 
 class Alternative(models.Model):
-    # Alternatives Choices
-    TRANSACTION_CHOICES = [
-        (0, 'STRING'),
-        (1, 'INPUT')
-    ]
     description = RichTextField('Descripcion', config_name='awesome_ckeditor')
     question = models.ForeignKey("core.Question", on_delete=models.PROTECT, blank=True, null=True)
-    alternative_type = models.IntegerField(
-        'Tipo alternativa', choices=TRANSACTION_CHOICES, default=1)
     created_at = models.DateTimeField(("creado el"), auto_now_add=True)
     updated_at = models.DateTimeField(("actualizado el"), auto_now=True)
 
@@ -207,15 +204,16 @@ class Alternative(models.Model):
         return self.description
 
 
-class TipoAlternativa(models.Model):
-    nombre = models.CharField('Nombre', max_length = 100)
+class AlternativeType(models.Model):
+    name = models.CharField('Nombre', max_length = 100)
 
     class Meta:
+        db_table = "core_alternative_type"
         verbose_name = ("Tipo Alternativa")
         verbose_name_plural = ("Tipos de Alternativas")
 
     def __str__(self):
-        return self.nombre
+        return self.name
 
 
 class Movement(models.Model):
@@ -223,6 +221,7 @@ class Movement(models.Model):
     answer = models.ManyToManyField(
         'core.Question',
         through='core.Answer')
+    movement_type = models.ForeignKey('core.MovementType', on_delete=models.CASCADE)
     created_at = models.DateTimeField(("creado el"), auto_now_add=True)
     updated_at = models.DateTimeField(("actualizado el"), auto_now=True) 
 
@@ -230,8 +229,19 @@ class Movement(models.Model):
         verbose_name = ("Movimiento")
         verbose_name_plural = ("Movimientos")
 
+
+class MovementType(models.Model):
+    name = models.CharField('Nombre', max_length = 100)
+    created_at = models.DateTimeField(("creado el"), auto_now_add=True)
+    updated_at = models.DateTimeField(("actualizado el"), auto_now=True) 
+
+    class Meta:
+        db_table = "core_movement_type"
+        verbose_name = ("Tipo Movimiento")
+        verbose_name_plural = ("Tipos Movimientos")
+
     def __str__(self):
-        return self.user
+        return self.name
 
 
 class Answer(models.Model):
@@ -248,7 +258,7 @@ class Answer(models.Model):
     updated_at = models.DateTimeField(("actualizado el"), auto_now=True)
 
     class Meta:
-        verbose_name = ("Movimiento")
-        verbose_name_plural = ("Movimientos")
+        verbose_name = ("Respuesta")
+        verbose_name_plural = ("Respuestas")
 
 

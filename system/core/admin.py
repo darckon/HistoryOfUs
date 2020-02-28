@@ -3,8 +3,9 @@ from django.contrib.auth.admin import UserAdmin
 from .models import (
     User, Story_Category, Story, 
     Text, Event, Step, QuestionType, 
-    Question, Alternative, Character, Rol,
-    Chapter)
+    Question, Alternative, AlternativeType, 
+    Character, Rol, Chapter, 
+    Movement, MovementType, Answer)
 
 
 @admin.register(User)
@@ -112,7 +113,22 @@ class AlternativeAdmin(admin.ModelAdmin):
         return obj.question.name
     get_question.short_description = 'Pregunta'
 
+@admin.register(AlternativeType)
+class AlternativeTypeAdmin(admin.ModelAdmin):
+    model = AlternativeType
+    list_display = ('name', )
+    list_per_page = 20
+
+
+@admin.register(MovementType)
+class MovementTypeAdmin(admin.ModelAdmin):
+    model = MovementType
+    list_display = ('name', )
+    list_per_page = 20
+
 
 admin.site.register(QuestionType)
+admin.site.register(Movement)
+admin.site.register(Answer)
 admin.site.register(Character)
 admin.site.register(Rol)

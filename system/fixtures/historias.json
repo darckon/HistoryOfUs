@@ -1,1 +1,0 @@
-[{"model": "core.historia", "pk": 1, "fields": {"nombre": "Game Of Thrones", "categoria": 1, "fecha_inicio": "2020-02-20", "fecha_termino": "2020-07-27", "activa": true, "created_at": "2020-02-20T14:31:10.774Z", "updated_at": "2020-02-20T14:31:10.774Z"}}]

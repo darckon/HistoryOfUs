@@ -1,0 +1,1 @@
+[{"model": "core.alternativetype", "pk": 1, "fields": {"name": "STRING"}}, {"model": "core.alternativetype", "pk": 2, "fields": {"name": "INPUT"}}]
